@@ -11,7 +11,7 @@ const PORT = 8000;
 const PASSWORD_SECRET = "bifin";
 const JWT_SECRET = "bifin";
 
-const deploymentURL = "";
+const deploymentURL = "https://enhanced-authentication.vercel.app/";
 
 const CSS_URL =
   "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
