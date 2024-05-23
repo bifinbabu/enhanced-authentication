@@ -6,18 +6,21 @@ const swaggerSpec = require("./routes/swaggerConfig");
 
 const passport = require("passport");
 const expressSession = require("express-session");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
+// const GoogleStrategy = require("passport-google-oauth20").Strategy;
+const GitHubStrategy = require("passport-github2").Strategy;
 
 const dotenv = require("dotenv");
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
 
 const {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
+  // GOOGLE_CLIENT_ID,
+  // GOOGLE_CLIENT_SECRET,
   MONGO_URL,
   CSS_URL,
   deploymentURL,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
 } = require("./config");
 
 dotenv.config();
@@ -47,17 +50,36 @@ app.get("/", async (req, res) => {
   res.send("Welcome to Enhanced Authentication.");
 });
 
-// --------------------Start Google auth -------------------------
+// ---------------------------------------------------------
 
 passport.use(
-  new GoogleStrategy(
+  new GitHubStrategy(
     {
-      clientID: GOOGLE_CLIENT_ID,
-      clientSecret: GOOGLE_CLIENT_SECRET,
-      callbackURL: "/google/callback",
+      clientID: GITHUB_CLIENT_ID,
+      clientSecret: GITHUB_CLIENT_SECRET,
+      callbackURL: "/github/callback",
     },
-    (accessToken, refreshToken, profile, callback) => {
-      callback(null, profile);
+    async (accessToken, refreshToken, profile, cb) => {
+      cb(null, profile);
+      // const user = await User.findOne({
+      //   accountId: profile.id,
+      //   provider: "github",
+      // });
+      // if (!user) {
+      //   console.log("Adding new github user to DB..");
+      //   const user = new User({
+      //     accountId: profile.id,
+      //     name: profile.username,
+      //     provider: profile.provider,
+      //   });
+      //   await user.save();
+      //   // console.log(user);
+      //   return cb(null, profile);
+      // } else {
+      //   console.log("Github user already exist in DB..");
+      //   // console.log(profile);
+      //   return cb(null, profile);
+      // }
     }
   )
 );
@@ -81,33 +103,34 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routes
 app.get(
-  "/api/auth/login/google",
-  (req, res, next) => {
-    // Add data to the request object
-    req.clientUrl = "Hello from /login/google!";
-    // Continue with the authentication process
-    next();
-  },
-  passport.authenticate("google", { scope: ["profile email"] })
+  "/api/auth/login/github",
+  passport.authenticate("github", { scope: ["user:email"] })
 );
 
 app.get(
-  "/google/callback",
-  passport.authenticate("google"),
-  async (req, res) => {
-    console.log(req.user);
-    if (req.user) {
-      res.redirect("http://localhost:8000/google/callback");
-      // res.redirect(`${deploymentURL}/google/callback`);
-    } else {
-      res.send("Google auth failed");
-    }
+  "/github/callback",
+  passport.authenticate("github", { failureRedirect: "/github/error" }),
+  function (req, res) {
+    // Successful authentication, redirect to success screen.
+    res.redirect("/github/success");
   }
 );
 
-// --------------------End Google auth -------------------------
+app.get("/github/success", async (req, res) => {
+  const userInfo = {
+    id: req.session.passport.user.id,
+    displayName: req.session.passport.user.username,
+    provider: req.session.passport.user.provider,
+  };
+  res
+    .status(200)
+    .json({ message: "Github authentication successful", user: userInfo });
+});
+
+app.get("/error", (req, res) => res.send("Error logging in via Github.."));
+
+// ---------------------------------------------------------
 
 // Swagger setup
 app.use(
