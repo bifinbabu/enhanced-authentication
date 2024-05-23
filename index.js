@@ -57,7 +57,7 @@ passport.use(
     {
       clientID: GITHUB_CLIENT_ID,
       clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: "/github/callback",
+      callbackURL: "https://enhanced-authentication.vercel.app/github/callback",
     },
     async (accessToken, refreshToken, profile, cb) => {
       cb(null, profile);
