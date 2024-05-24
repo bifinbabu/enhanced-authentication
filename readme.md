@@ -9,7 +9,7 @@ IMPORTANT NOTE 1: For testing the endpoints in the user routes, you need to firs
 <hr />
 IMPORTANT NOTE 2: For using Github authentication, open your browser and go to: https://enhanced-authentication.vercel.app/api/auth/login/github.
 After successful login, use the token you got as response to test APIs in Swagger API playground.
-
+<hr />
 - Hosted on Vercel: https://enhanced-authentication.vercel.app/
 - Swagger is used for API documentation and interactive testing. You can access the Swagger UI at: https://enhanced-authentication.vercel.app/api-docs/
 
