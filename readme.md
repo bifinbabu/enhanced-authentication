@@ -5,6 +5,8 @@ This project is an enhanced backend API for an authentication system, featuring 
 ## Hosting and API Playground
 
 IMPORTANT NOTE 1: For testing the endpoints in the user routes, you need to first log in. The token received after logging in must be used to authorize in Swagger.
+
+<hr />
 IMPORTANT NOTE 2: For using Github authentication, open your browser and go to: https://enhanced-authentication.vercel.app/api/auth/login/github.
 After successful login, use the token you got as response to test APIs in Swagger API playground.
 
