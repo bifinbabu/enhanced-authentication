@@ -4,6 +4,8 @@ This project is an enhanced backend API for an authentication system, featuring 
 
 ## Hosting and API Playground
 
+IMPORTANT NOTE: For testing the endpoints in the user routes, you need to first log in. The token received after logging in must be used to authorize in Swagger.
+
 - Hosted on Vercel: https://enhanced-authentication.vercel.app/
 - Swagger is used for API documentation and interactive testing. You can access the Swagger UI at: https://enhanced-authentication.vercel.app/api-docs/
 
