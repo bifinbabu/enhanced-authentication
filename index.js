@@ -6,22 +6,13 @@ const swaggerSpec = require("./routes/swaggerConfig");
 
 const passport = require("passport");
 const expressSession = require("express-session");
-// const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const GitHubStrategy = require("passport-github2").Strategy;
 
 const dotenv = require("dotenv");
 const userRoute = require("./routes/user");
 const authRoute = require("./routes/auth");
+const githubRoute = require("./routes/githubAuth");
 
-const {
-  // GOOGLE_CLIENT_ID,
-  // GOOGLE_CLIENT_SECRET,
-  MONGO_URL,
-  CSS_URL,
-  deploymentURL,
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
-} = require("./config");
+const { MONGO_URL, CSS_URL } = require("./config");
 
 dotenv.config();
 
@@ -50,51 +41,9 @@ app.get("/", async (req, res) => {
   res.send("Welcome to Enhanced Authentication.");
 });
 
-// ---------------------------------------------------------
-
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID: GITHUB_CLIENT_ID,
-      clientSecret: GITHUB_CLIENT_SECRET,
-      callbackURL: "https://enhanced-authentication.vercel.app/github/callback",
-    },
-    async (accessToken, refreshToken, profile, cb) => {
-      cb(null, profile);
-      // const user = await User.findOne({
-      //   accountId: profile.id,
-      //   provider: "github",
-      // });
-      // if (!user) {
-      //   console.log("Adding new github user to DB..");
-      //   const user = new User({
-      //     accountId: profile.id,
-      //     name: profile.username,
-      //     provider: profile.provider,
-      //   });
-      //   await user.save();
-      //   // console.log(user);
-      //   return cb(null, profile);
-      // } else {
-      //   console.log("Github user already exist in DB..");
-      //   // console.log(profile);
-      //   return cb(null, profile);
-      // }
-    }
-  )
-);
-
-passport.serializeUser((user, callback) => {
-  callback(null, user);
-});
-
-passport.deserializeUser((user, callback) => {
-  callback(null, user);
-});
-
 app.use(
   expressSession({
-    secret: "passport_google",
+    secret: "passport",
     resave: true,
     saveUninitialized: true,
   })
@@ -102,35 +51,6 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.get(
-  "/api/auth/login/github",
-  passport.authenticate("github", { scope: ["user:email"] })
-);
-
-app.get(
-  "/github/callback",
-  passport.authenticate("github", { failureRedirect: "/github/error" }),
-  function (req, res) {
-    // Successful authentication, redirect to success screen.
-    res.redirect("/github/success");
-  }
-);
-
-app.get("/github/success", async (req, res) => {
-  const userInfo = {
-    id: req.session.passport.user.id,
-    displayName: req.session.passport.user.username,
-    provider: req.session.passport.user.provider,
-  };
-  res
-    .status(200)
-    .json({ message: "Github authentication successful", user: userInfo });
-});
-
-app.get("/error", (req, res) => res.send("Error logging in via Github.."));
-
-// ---------------------------------------------------------
 
 // Swagger setup
 app.use(
@@ -143,7 +63,9 @@ app.use(
   })
 );
 
+// Routes
 app.use("/api/auth", authRoute);
+app.use("/api/auth/login", githubRoute);
 app.use("/api/users", userRoute);
 
 const port = 8000;

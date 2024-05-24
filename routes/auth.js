@@ -37,6 +37,21 @@ const { PASSWORD_SECRET, JWT_SECRET } = require("../config");
  *               password:
  *                 type: string
  *                 description: The user's password
+ *               isAdmin:
+ *                 type: boolean
+ *                 description: Indicates if the user has admin privileges
+ *               isPrivate:
+ *                 type: boolean
+ *                 description: Indicates if the user's profile is private
+ *               profilePictureUrl:
+ *                 type: string
+ *                 description: URL of the user's profile picture
+ *               bio:
+ *                 type: string
+ *                 description: A short bio of the user
+ *               externalAccountId:
+ *                 type: string
+ *                 description: Profile id from external authentication provider
  *     responses:
  *       200:
  *         description: The user was successfully registered
@@ -51,6 +66,18 @@ const { PASSWORD_SECRET, JWT_SECRET } = require("../config");
  *                   type: string
  *                 email:
  *                   type: string
+ *                 isAdmin:
+ *                   type: boolean
+ *                 isPrivate:
+ *                   type: boolean
+ *                 profilePictureUrl:
+ *                   type: string
+ *                 bio:
+ *                   type: string
+ *                 externalAccountId:
+ *                   type: string
+ *       400:
+ *         description: Invalid input, object invalid
  *       500:
  *         description: Some server error
  */
@@ -64,6 +91,11 @@ router.post("/register", async (req, res) => {
       req.body.password,
       PASSWORD_SECRET
     ).toString(),
+    isAdmin: req.body.isAdmin,
+    isPrivate: req.body.isPrivate,
+    profilePictureUrl: req.body.profilePictureUrl,
+    bio: req.body.bio,
+    externalAccountId: req.body.externalAccountId,
   });
   try {
     const savedUser = await newUser.save();
@@ -163,7 +195,6 @@ router.post("/login", async (req, res, next) => {
 // Logout user
 router.post("/logout", (req, res) => {
   try {
-    // Clear the token on the client side by instructing the client
     res.status(200).json({ message: "User logged out successfully" });
   } catch (error) {
     res.status(500).json({ message: "Logout failed", data: error });

@@ -1,5 +1,5 @@
 const swaggerJSDoc = require("swagger-jsdoc");
-const { deploymentURL } = require("../config");
+const { baseUrl } = require("../config");
 
 const options = {
   definition: {
@@ -11,8 +11,21 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:8000",
-        // url: deploymentURL,
+        url: baseUrl,
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
       },
     ],
   },

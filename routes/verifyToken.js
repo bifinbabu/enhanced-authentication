@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("../config");
 
 const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.token;
+  const authHeader = req.headers.authorization;
   if (authHeader) {
     const token = authHeader.split(" ")[1];
     jwt.verify(token, JWT_SECRET, (err, user) => {
@@ -27,18 +27,7 @@ const verifyTokenAndAuthorization = (req, res, next) => {
   });
 };
 
-const verifyTokenAndAdmin = (req, res, next) => {
-  verifyToken(req, res, () => {
-    if (req.user.isAdmin) {
-      next();
-    } else {
-      return res.status(403).json("You are not allowed to do that");
-    }
-  });
-};
-
 module.exports = {
   verifyToken,
   verifyTokenAndAuthorization,
-  verifyTokenAndAdmin,
 };
